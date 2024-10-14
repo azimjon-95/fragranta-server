@@ -20,13 +20,20 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'Miqdori noto\'g\'ri formatda' });
         }
 
+        // Balansni yangilash: xarajat miqdorini cashBalance dan ayirish
+        balance.cashBalance -= expenseAmount;
+
+        // Agar balans manfiy bo'lsa, error qaytarish
+        if (balance.cashBalance < 0) {
+            return res.status(400).json({ message: 'Balans yetarli emas' });
+        }
+
+        // Balansni saqlash
+        await balance.save();
+
         // Xarajat qo'shish
         const newExpense = new Expense({ description, amount: expenseAmount });
         await newExpense.save();
-
-        // Balansni yangilash
-        balance.cashBalance -= expenseAmount; // Miqdorni ayirish
-        await balance.save();
 
         res.status(201).json({
             message: 'Xarajat muvaffaqiyatli qo\'shildi va balans yangilandi',
@@ -37,6 +44,8 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+module.exports = router;
 
 // Get all expenses
 router.get('/', async (req, res) => {

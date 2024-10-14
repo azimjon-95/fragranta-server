@@ -47,44 +47,55 @@ router.post('/', function _callee(req, res) {
           }));
 
         case 10:
+          // Balansni yangilash: xarajat miqdorini cashBalance dan ayirish
+          balance.cashBalance -= expenseAmount; // Agar balans manfiy bo'lsa, error qaytarish
+
+          if (!(balance.cashBalance < 0)) {
+            _context.next = 13;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(400).json({
+            message: 'Balans yetarli emas'
+          }));
+
+        case 13:
+          _context.next = 15;
+          return regeneratorRuntime.awrap(balance.save());
+
+        case 15:
           // Xarajat qo'shish
           newExpense = new Expense({
             description: description,
             amount: expenseAmount
           });
-          _context.next = 13;
+          _context.next = 18;
           return regeneratorRuntime.awrap(newExpense.save());
 
-        case 13:
-          // Balansni yangilash
-          balance.cashBalance -= expenseAmount; // Miqdorni ayirish
-
-          _context.next = 16;
-          return regeneratorRuntime.awrap(balance.save());
-
-        case 16:
+        case 18:
           res.status(201).json({
             message: 'Xarajat muvaffaqiyatli qo\'shildi va balans yangilandi',
             newExpense: newExpense,
             updatedBalance: balance.cashBalance
           });
-          _context.next = 22;
+          _context.next = 24;
           break;
 
-        case 19:
-          _context.prev = 19;
+        case 21:
+          _context.prev = 21;
           _context.t0 = _context["catch"](1);
           res.status(500).json({
             error: _context.t0.message
           });
 
-        case 22:
+        case 24:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[1, 19]]);
-}); // Get all expenses
+  }, null, null, [[1, 21]]);
+});
+module.exports = router; // Get all expenses
 
 router.get('/', function _callee2(req, res) {
   var expenses;
