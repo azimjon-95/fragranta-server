@@ -20,10 +20,12 @@ const saleRoutes = require('./routes/sales');
 const balanceRoutes = require('./routes/balances');
 const expenseRoutes = require('./routes/expenses');
 
+const todos = require('./routes/todoList');
 app.use('/api/products', productRoutes);
 app.use('/api/sales', saleRoutes);
 app.use('/api/balances', balanceRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/todos', todos);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)

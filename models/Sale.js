@@ -14,9 +14,12 @@ const saleSchema = new mongoose.Schema({
         name: { type: String }, // Mahsulot nomi
         price: { type: Number }, // Mahsulot narxi
         quantity: { type: Number }, // Mahsulot miqdori
+        sellPrice: { type: Number }, // Mahsulot narxi
         total: { type: Number }, // Umumiy summa
     }],
     date: { type: Date, default: Date.now }, // Sotuv sanasi
 });
 
 module.exports = mongoose.model('Sale', saleSchema);
+
+
