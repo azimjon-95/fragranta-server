@@ -38,39 +38,28 @@ router.post('/', function _callee(req, res) {
   }, null, null, [[0, 7]]);
 });
 router.get('/total-purchase-price', function _callee2(req, res) {
-  var result, totalPurchasePrice;
+  var products, totalPurchasePrice;
   return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.prev = 0;
           _context2.next = 3;
-          return regeneratorRuntime.awrap(Product.aggregate([{
-            // Faqat quantity 0 dan katta bo'lgan hujjatlarni tanlash
-            $match: {
-              quantity: {
-                $gt: 0
-              }
-            }
-          }, {
-            // Hujjatlarni guruhlash va `purchasePrice` ni yig'ish
-            $group: {
-              _id: null,
-              // Bizga hech qanday maxsus maydon bo'yicha guruhlash kerak emas
-              totalPurchasePrice: {
-                $sum: "$purchasePrice"
-              }
-            }
-          }]));
+          return regeneratorRuntime.awrap(Product.find());
 
         case 3:
-          result = _context2.sent;
-          // Agar natija bo'sh bo'lsa, totalPurchasePrice ni 0 ga tenglang
-          totalPurchasePrice = result.length > 0 ? result[0].totalPurchasePrice : 0; // totalPurchasePrice ni javob sifatida yuboring
+          products = _context2.sent;
+          // Har bir mahsulotning purchasePrice * quantity ni ko'paytirish va jamlash
+          totalPurchasePrice = products.reduce(function (total, product) {
+            var productTotal = product.purchasePrice * product.quantity; // purchasePrice * quantity
+
+            return total + productTotal; // Natijani jamlash
+          }, 0); // 0 boshlang'ich qiymat
 
           res.status(200).json({
             totalPurchasePrice: totalPurchasePrice
-          });
+          }); // Umumiy natijani qaytarish
+
           _context2.next = 11;
           break;
 

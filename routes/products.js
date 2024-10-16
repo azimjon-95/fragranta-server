@@ -15,32 +15,21 @@ router.post('/', async (req, res) => {
 
 router.get('/total-purchase-price', async (req, res) => {
     try {
-        // MongoDB agregatsiya ramkasidan foydalanib purchasePrice ni hisoblang
-        const result = await Product.aggregate([
-            {
-                // Faqat quantity 0 dan katta bo'lgan hujjatlarni tanlash
-                $match: {
-                    quantity: { $gt: 0 }
-                }
-            },
-            {
-                // Hujjatlarni guruhlash va `purchasePrice` ni yig'ish
-                $group: {
-                    _id: null, // Bizga hech qanday maxsus maydon bo'yicha guruhlash kerak emas
-                    totalPurchasePrice: { $sum: "$purchasePrice" }
-                }
-            }
-        ]);
+        // Barcha mahsulotlarni olish
+        const products = await Product.find();
 
-        // Agar natija bo'sh bo'lsa, totalPurchasePrice ni 0 ga tenglang
-        const totalPurchasePrice = result.length > 0 ? result[0].totalPurchasePrice : 0;
+        // Har bir mahsulotning purchasePrice * quantity ni ko'paytirish va jamlash
+        const totalPurchasePrice = products.reduce((total, product) => {
+            const productTotal = product.purchasePrice * product.quantity; // purchasePrice * quantity
+            return total + productTotal; // Natijani jamlash
+        }, 0); // 0 boshlang'ich qiymat
 
-        // totalPurchasePrice ni javob sifatida yuboring
-        res.status(200).json({ totalPurchasePrice });
+        res.status(200).json({ totalPurchasePrice }); // Umumiy natijani qaytarish
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 
 // Get all products
@@ -74,3 +63,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
+
