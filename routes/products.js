@@ -13,6 +13,31 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Get total quantity and product count
+router.get('/total-quantity', async (req, res) => {
+    try {
+        // Aggregate method to sum up the quantity
+        const result = await Product.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalQuantity: { $sum: "$quantity" }
+                }
+            }
+        ]);
+
+        // Count the number of products
+        const productCount = await Product.countDocuments();
+
+        // If result array is empty, return totalQuantity as 0
+        const totalQuantity = result.length > 0 ? result[0].totalQuantity : 0;
+
+        res.status(200).json({ totalQuantity, productCount });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/total-purchase-price', async (req, res) => {
     try {
         // Barcha mahsulotlarni olish
